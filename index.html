@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Panel Admin | Firestore</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{background:#070b14;color:#fff;font-family:Arial}
+.card{background:#0e1627;padding:16px;border-radius:14px;margin:14px}
+.user{background:#121c33;padding:10px;border-radius:10px;margin-top:8px}
+h2{color:#00ffcc;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>👥 USUARIOS (FIRESTORE)</h2>
+  <div id="lista">Cargando...</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, getDocs }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAKrBTAkJGhB9s3E3MExqzj8mtXgKYsWRc",
+  authDomain: "davidstore-51f7f.firebaseapp.com",
+  projectId: "davidstore-51f7f",
+  storageBucket: "davidstore-51f7f.firebasestorage.app",
+  messagingSenderId: "363278778609",
+  appId: "1:363278778609:web:0714ebb6903b931a616950"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, async(user)=>{
+  if(!user){
+    document.getElementById("lista").innerText="❌ No logueado";
+    return;
+  }
+
+  const snap = await getDocs(collection(db,"users"));
+  let html="";
+
+  snap.forEach(d=>{
+    const u = d.data();
+    html += `
+      <div class="user">
+        📧 ${u.email}<br>
+        💰 Saldo: ${u.saldo ?? 0}<br>
+        🆔 ${d.id}
+      </div>
+    `;
+  });
+
+  document.getElementById("lista").innerHTML = html || "Sin datos";
+});
+</script>
+</body>
+</html>
